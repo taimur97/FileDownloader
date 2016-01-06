@@ -7,7 +7,7 @@ Android 文件下载引擎，稳定、高效、简单易用
 
 > [README DOC](https://github.com/lingochamp/FileDownloader/blob/master/README.md)
 
-> 本引擎依赖okhttp
+> 本引擎依赖okhttp 2.7.1
 
 ---
 #### 版本迭代日志: [Change Log](https://github.com/lingochamp/FileDownloader/blob/master/CHANGELOG.md)
@@ -22,7 +22,7 @@ Android 文件下载引擎，稳定、高效、简单易用
 
 #### 需要注意
 
-- 为了绝大多数使用性能考虑，目前下载引擎目前受限于int可表示的范围，而我们的回调`total`与`so far`以byte为单位回调，因此最大只能表示到`2^31-1`=2_147_483_647 = 1.99GB(ps: 如果有更大的文件下载需求，提issue，我们会进行一些巧妙的优化，利用负值区间？根据大小走特殊通道传输?)
+- 当下载的文件大小可能大于1.99GB(2^31-1`=2_147_483_647 = 1.99GB`)的时候, 请使用`FileDownloadLargeFileListener`而不是`FileDownloadListener`(同理使用`getLargeFileSofarBytes()`与`getLargeFileTotalBytes()`)
 - 暂停: paused, 恢复: 直接调用start，默认就是断点续传
 
 #### 使用okHttp并使用其中的一些默认属性
@@ -43,7 +43,7 @@ Android 文件下载引擎，稳定、高效、简单易用
 在项目中引用:
 
 ```
-compile 'com.liulishuo.filedownloader:library:0.1.2'
+compile 'com.liulishuo.filedownloader:library:0.1.3'
 ```
 
 #### 全局初始化在`Application.onCreate`中
@@ -87,7 +87,7 @@ FileDownloader.getImpl().create(url)
             @Override
             protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
             }
-            
+
             @Override
             protected void completed(BaseDownloadTask task) {
             }
@@ -129,7 +129,7 @@ final FileDownloadListener queueTarget = new FileDownloadListener() {
             @Override
             protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
             }
-            
+
             @Override
             protected void completed(BaseDownloadTask task) {
             }
@@ -278,4 +278,3 @@ limitations under the License.
 [bintray_svg]: https://api.bintray.com/packages/jacksgong/maven/FileDownloader/images/download.svg
 [bintray_url]: https://bintray.com/jacksgong/maven/FileDownloader/_latestVersion
 [file_download_listener_callback_flow_png]: https://github.com/lingochamp/FileDownloader/raw/master/art/filedownloadlistener_callback_flow.png
-

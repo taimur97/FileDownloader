@@ -50,10 +50,10 @@ class FileDownloadRunnable implements Runnable {
 
     private final IFileDownloadDBHelper helper;
 
-    private int maxNotifyBytes;
+    private long maxNotifyBytes;
 
 
-    private int maxNotifyNums = 0;
+    private int maxNotifyCounts = 0;
 
     //tmp
     private boolean isContinueDownloadAvailable;
@@ -90,8 +90,8 @@ class FileDownloadRunnable implements Runnable {
         downloadTransfer.setSoFarBytes(model.getSoFar());
         downloadTransfer.setTotalBytes(model.getTotal());
 
-        maxNotifyNums = model.getCallbackProgressTimes();
-        maxNotifyNums = maxNotifyNums <= 0 ? 0 : maxNotifyNums;
+        maxNotifyCounts = model.getCallbackProgressTimes();
+        maxNotifyCounts = maxNotifyCounts <= 0 ? 0 : maxNotifyCounts;
 
         this.isContinueDownloadAvailable = false;
 
@@ -138,7 +138,7 @@ class FileDownloadRunnable implements Runnable {
         // 进入下载
         do {
 
-            int soFar = 0;
+            long soFar = 0;
             try {
 
                 if (model.isCanceled()) {
@@ -164,10 +164,9 @@ class FileDownloadRunnable implements Runnable {
                 final boolean isSucceedContinue = response.code() == 206 && isContinueDownloadAvailable;
 
                 if (isSucceedStart || isSucceedContinue) {
-                    int total = downloadTransfer.getTotalBytes();
+                    long total = downloadTransfer.getTotalBytes();
                     if (isSucceedStart || total == 0) {
-                        // TODO 目前没有对 2^31-1bit以上大小支持，未来会开发一个对应的库
-                        total = (int) response.body().contentLength();
+                        total = response.body().contentLength();
                     }
 
                     if (isSucceedContinue) {
@@ -180,22 +179,22 @@ class FileDownloadRunnable implements Runnable {
                     try {
                         inputStream = response.body().byteStream();
                         byte[] buff = new byte[BUFFER_SIZE];
-                        maxNotifyBytes = maxNotifyNums <= 0 ? -1 : total / maxNotifyNums;
+                        maxNotifyBytes = maxNotifyCounts <= 0 ? -1 : total / maxNotifyCounts;
 
                         updateHeader(response);
                         onConnected(isSucceedContinue, soFar, total);
 
 
                         do {
-                            int readed = inputStream.read(buff);
-                            if (readed == -1) {
+                            int byteCount = inputStream.read(buff);
+                            if (byteCount == -1) {
                                 break;
                             }
 
-                            accessFile.write(buff, 0, readed);
+                            accessFile.write(buff, 0, byteCount);
 
                             //write buff
-                            soFar += readed;
+                            soFar += byteCount;
                             if (accessFile.length() < soFar) {
                                 // 文件大小必须会等于正在写入的大小
                                 throw new RuntimeException(String.format("file be changed by others when downloading %d %d", accessFile.length(), soFar));
@@ -289,7 +288,7 @@ class FileDownloadRunnable implements Runnable {
 
     private final DownloadTransferEvent event = new DownloadTransferEvent(null);
 
-    private void onConnected(final boolean isContinue, final int soFar, final int total) {
+    private void onConnected(final boolean isContinue, final long soFar, final long total) {
         downloadTransfer.setSoFarBytes(soFar);
         downloadTransfer.setTotalBytes(total);
         downloadTransfer.setEtag(this.etag);
@@ -303,7 +302,7 @@ class FileDownloadRunnable implements Runnable {
 
     private long lastNotifiedSoFar = 0;
 
-    private void onProcess(final int soFar, final int total) {
+    private void onProcess(final long soFar, final long total) {
         if (soFar != total) {
             downloadTransfer.setSoFarBytes(soFar);
             downloadTransfer.setTotalBytes(total);
@@ -324,7 +323,7 @@ class FileDownloadRunnable implements Runnable {
 
     }
 
-    private void onRetry(Throwable ex, final int retryTimes, final int soFarBytes){
+    private void onRetry(Throwable ex, final int retryTimes, final long soFarBytes){
         FileDownloadLog.e(this, ex, "On retry %d %s %d %d", downloadTransfer.getDownloadId(), ex.getMessage(), retryTimes, autoRetryTimes);
 
         ex = exFiltrate(ex);
@@ -355,7 +354,7 @@ class FileDownloadRunnable implements Runnable {
         FileDownloadProcessEventPool.getImpl().asyncPublishInNewThread(event.setTransfer(downloadTransfer));
     }
 
-    private void onComplete(final int total) {
+    private void onComplete(final long total) {
         FileDownloadLog.d(this, "On completed %d %d", downloadTransfer.getDownloadId(), total);
         downloadTransfer.setStatus(FileDownloadStatus.completed);
 
@@ -393,7 +392,7 @@ class FileDownloadRunnable implements Runnable {
     // ----------------------------------
     private RandomAccessFile getRandomAccessFile(final boolean append) throws Throwable {
         if (TextUtils.isEmpty(path)) {
-            throw new RuntimeException(String.format("found invalid internal destination path, empty"));
+            throw new RuntimeException("found invalid internal destination path, empty");
         }
 
         if (!FileDownloadUtils.isFilenameValid(path)) {

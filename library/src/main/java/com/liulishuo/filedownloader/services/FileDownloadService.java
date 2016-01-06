@@ -98,9 +98,8 @@ public class FileDownloadService extends BaseFileService<IFileDownloadIPCCallbac
 
         @Override
         public int start(String url, String path, int callbackProgressTimes, int autoRetryTimes) throws RemoteException {
-            final int downloadId = downloadManager.start(url, path, callbackProgressTimes, autoRetryTimes);
 
-            return downloadId;
+            return downloadManager.start(url, path, callbackProgressTimes, autoRetryTimes);
         }
 
         @Override
@@ -109,12 +108,12 @@ public class FileDownloadService extends BaseFileService<IFileDownloadIPCCallbac
         }
 
         @Override
-        public int getSofar(int downloadId) throws RemoteException {
+        public long getSofar(int downloadId) throws RemoteException {
             return downloadManager.getSoFar(downloadId);
         }
 
         @Override
-        public int getTotal(int downloadId) throws RemoteException {
+        public long getTotal(int downloadId) throws RemoteException {
             return downloadManager.getTotal(downloadId);
         }
     }

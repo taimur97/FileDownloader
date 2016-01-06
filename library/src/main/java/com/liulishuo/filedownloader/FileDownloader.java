@@ -151,25 +151,25 @@ public class FileDownloader {
     /**
      * Get downloaded so far bytes by the downloadId
      */
-    public int getSoFar(final int downloadId) {
+    public long getSoFar(final int downloadId) {
         BaseDownloadTask downloadTask = FileDownloadList.getImpl().get(downloadId);
         if (downloadTask == null) {
             return FileDownloadServiceUIGuard.getImpl().getSofar(downloadId);
         }
 
-        return downloadTask.getSoFarBytes();
+        return downloadTask.getLargeFileSoFarBytes();
     }
 
     /**
      * Get file total bytes by the downloadId
      */
-    public int getTotal(final int downloadId) {
+    public long getTotal(final int downloadId) {
         BaseDownloadTask downloadTask = FileDownloadList.getImpl().get(downloadId);
         if (downloadTask == null) {
             return FileDownloadServiceUIGuard.getImpl().getTotal(downloadId);
         }
 
-        return downloadTask.getTotalBytes();
+        return downloadTask.getLargeFileTotalBytes();
     }
 
     /**
@@ -252,7 +252,7 @@ public class FileDownloader {
 
 
                 list.get(msg.arg1)
-                        .setFinishListener(new BaseDownloadTask.FinishListener() {
+                        .addFinishListener(new BaseDownloadTask.FinishListener() {
                             private int index;
 
                             public BaseDownloadTask.FinishListener setIndex(int index) {

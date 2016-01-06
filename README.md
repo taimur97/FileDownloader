@@ -1,5 +1,5 @@
 # FileDownloader
-Android multi-task file download engine. 
+Android multi-task file download engine.
 
 
 [![Download][bintray_svg]][bintray_url]
@@ -8,14 +8,14 @@ Android multi-task file download engine.
 
 > [中文文档](https://github.com/lingochamp/FileDownloader/blob/master/README-zh.md)
 
-> This project dependency on [square/okhttp](https://github.com/square/okhttp) 
+> This project dependency on [square/okhttp 2.7.1](https://github.com/square/okhttp)
 
 ## DEMO
 
 ![][serial_tasks_demo_gif]
 ![][parallel_tasks_demo_gif]
 ![][single_task_demo_gif]
-![][mix_tasks_demo_gif]
+![][hybrid_test_demo_gif]
 
 
 ## Installation
@@ -24,7 +24,7 @@ FileDownloader is installed by adding the following dependency to your build.gra
 
 ```
 dependencies {
-    compile 'com.liulishuo.filedownloader:library:0.1.2'
+    compile 'com.liulishuo.filedownloader:library:0.1.3'
 }
 ```
 
@@ -42,7 +42,7 @@ public XXApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
-        // Just cache ApplicationContext and initial EventPool Object
+        // Just cache ApplicationContext
         FileDownloader.init(this);
     }
 
@@ -75,7 +75,7 @@ FileDownloader.getImpl().create(url)
             @Override
             protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
             }
-            
+
             @Override
             protected void completed(BaseDownloadTask task) {
             }
@@ -119,7 +119,7 @@ final FileDownloadListener queueTarget = new FileDownloadListener() {
             @Override
             protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
             }
-            
+
             @Override
             protected void completed(BaseDownloadTask task) {
             }
@@ -165,7 +165,7 @@ if(parallel){
 
 | function | description
 | --- | ---
-| init(Application) |  Just cache ApplicationContext and initial EventPool Object
+| init(Application) |  Just cache ApplicationContext
 | create(url:String) | Create a download task
 | start(listener:FileDownloadListener, isSerial:boolean) | Start the download queue by the same listener
 | pause(listener:FileDownloadListener) | Pause the download queue by the same listener
@@ -202,7 +202,7 @@ if(parallel){
 | getStatus(void):int | Get current status
 | isForceReDownload(void):boolean | Force re-download,do not care about whether already downloaded or not
 | getEx(void):Throwable | Get throwable
-| isReusedOldFile(void):boolean | Is reused downloaded old file 
+| isReusedOldFile(void):boolean | Is reused downloaded old file
 | getTag(void):Object | Get the task's tag
 | isContinue(void):boolean | Is resume by breakpoint
 | getEtag(void):String | Get current ETag on header
@@ -246,7 +246,7 @@ blockComplete -> completed
 
 ## Attention
 
-- For the vast majority of the use of performance considerations, limited to the range of int, FileDownloader engine maximum support for the download file size does not exceed 1.99G(`2^31-1=2_147_483_647`)
+- Using `FileDownloadLargeFileListener` instance instead of `FileDownloadListener`, when file size maybe greater than 1.99G(`2^31-1=2_147_483_647`)(The same use: `getLargeFileSoFarBytes()` and `getLargeFileTotalBytes()`).
 - Default by okhttp: retryOnConnectionFailure: Unreachable IP addresses/Stale pooled connections/Unreachable proxy servers
 - Default by okhttp: connection/read/write time out 10s
 
@@ -272,10 +272,10 @@ limitations under the License.
 [license_2_svg]: https://img.shields.io/hexpm/l/plug.svg
 [android_platform_svg]: https://img.shields.io/badge/Platform-Android-brightgreen.svg
 [file_downloader_svg]: https://img.shields.io/badge/Android-FileDownloader-orange.svg
-[mix_tasks_demo_gif]: https://github.com/lingochamp/FileDownloader/raw/master/art/mix_tasks_demo.gif
+[hybrid_test_demo_gif]: https://github.com/lingochamp/FileDownloader/raw/master/art/hybrid_test_demo.gif
 [parallel_tasks_demo_gif]: https://github.com/lingochamp/FileDownloader/raw/master/art/parallel_tasks_demo.gif
 [serial_tasks_demo_gif]: https://github.com/lingochamp/FileDownloader/raw/master/art/serial_tasks_demo.gif
-[single_task_demo_gif]: https://github.com/lingochamp/FileDownloader/raw/master/art/single_task_demo.gif
+[single_task_demo_gif]: https://github.com/lingochamp/FileDownloader/raw/master/art/single_task_demo_en.gif
 [bintray_svg]: https://api.bintray.com/packages/jacksgong/maven/FileDownloader/images/download.svg
 [bintray_url]: https://bintray.com/jacksgong/maven/FileDownloader/_latestVersion
 [file_download_listener_callback_flow_png]: https://github.com/lingochamp/FileDownloader/raw/master/art/filedownloadlistener_callback_flow.png

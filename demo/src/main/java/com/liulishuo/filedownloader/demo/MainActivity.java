@@ -8,6 +8,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.liulishuo.filedownloader.demo.performance.PerformanceTestActivity;
+
 /**
  * Created by Jacksgong on 12/17/15.
  */
@@ -20,24 +22,28 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    public void onClickMix(final View view) {
-        startActivity(new Intent(this, MixTestActivity.class));
+    public void onClickMultitask(final View view) {
+        startActivity(new Intent(this, MultitaskTestActivity.class));
     }
 
     public void onClickSingle(final View view) {
-        startActivity(new Intent(this, SingleTaskActivity.class));
+        startActivity(new Intent(this, SingleTaskTestActivity.class));
     }
 
-    public void onClickPerformanceMonitor(final View view) {
-        startActivity(new Intent(this, PerformanceActivity.class));
+    public void onClickMix(final View view) {
+        startActivity(new Intent(this, HybridTestActivity.class));
     }
+
+    public void onClickPerformance(final View view){
+        startActivity(new Intent(this, PerformanceTestActivity.class));
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
 
 
     @Override
